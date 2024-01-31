@@ -5,7 +5,6 @@ import NotificationContext from '../NotificationContext'
 
 const AnecdoteForm = () => {
   const [notification, dispatch] = useContext(NotificationContext)
-
   const queryClient = useQueryClient()
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,

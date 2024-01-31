@@ -8,13 +8,13 @@ const Notification = () => {
     if (notification.visible) {
       timeout = setTimeout(() => {
         dispatch({ type: "HIDE_NOTIFICATION" })
-      }, 3000)
+      }, 5000)
     }
 
     return () => {
       clearTimeout(timeout)
     }
-  }, [notification])
+  }, [notification.visible]);
 
   const style = {
     border: 'solid',
