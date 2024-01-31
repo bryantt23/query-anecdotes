@@ -1,57 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import AnecdoteForm from './components/AnecdoteForm'
-import Notification from './components/Notification'
-import { getAnecdotes, updateAnecdote } from './requests'
+import AnecdoteList from "./components/AnecdoteList"
+import NotificationContext from './NotificationContext'
+import { useReducer } from "react"
+
+const initialState = {
+  message: "",
+  visible: false
+}
+
+const notificationReducer = (state, action) => {
+  switch (action.type) {
+    case "SHOW_NOTIFICATION":
+      return { ...state, visible: true, message: action.message };
+    case "HIDE_NOTIFICATION":
+      return { ...state, visible: false };
+    default:
+      return state
+  }
+}
 
 const App = () => {
-  const queryClient = useQueryClient()
-  const { data, isError, isLoading, error } = useQuery({
-    queryKey: ['anecdotes'],
-    queryFn: getAnecdotes,
-    retry: false
-  })
-
-  const updateAnecdoteMutation = useMutation({
-    mutationFn: updateAnecdote,
-    onSuccess: () => {
-      console.log('hiii')
-      queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
-    },
-  })
-
-  if (isLoading) {
-    return <div>loading data...</div>
-  }
-
-  if (isError) {
-    return <span>Error: {error.message}</span>
-  }
-
-  const anecdotes = data
-
-  const handleVote = (anecdote) => {
-    updateAnecdoteMutation.mutate({ ...anecdote, votes: anecdote.votes + 1 })
-  }
+  const [notification, notificationDispatch] = useReducer(notificationReducer, initialState)
 
   return (
-    <div>
-      <h3>Anecdote app</h3>
-
-      <Notification />
-      <AnecdoteForm />
-
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
-          <div>
-            {anecdote.content}
-          </div>
-          <div>
-            has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
-          </div>
-        </div>
-      )}
-    </div>
+    <NotificationContext.Provider value={[notification, notificationDispatch]}>
+      <AnecdoteList />
+    </NotificationContext.Provider>
   )
 }
 
